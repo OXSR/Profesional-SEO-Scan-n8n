@@ -1,0 +1,1060 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ec15c986-2924-4fc4-ad82-fa08cfba7957",
+              "leftValue": "={{ $json.loc }}",
+              "rightValue": "(wp|png|jpg|css|js|gif|php|assets|fonts)",
+              "operator": {
+                "type": "string",
+                "operation": "notRegex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -740,
+        400
+      ],
+      "id": "ebfcc63c-ec98-4563-9d66-a9bfb391e151",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.urls }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -440,
+        860
+      ],
+      "id": "0d871973-a01f-48d7-a26e-503a059321be",
+      "name": "ObtenerContenidoWeb",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -940,
+        740
+      ],
+      "id": "405c9eb3-4935-4bce-8535-c7145eb923ee",
+      "name": "Iterar Páginas"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "urlset.url",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -940,
+        400
+      ],
+      "id": "71c3059f-eb20-4534-8b20-7142436821d0",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "607a2547-205f-402f-b3ed-e9714c397cc8",
+              "name": "urls",
+              "value": "={{ $json.loc }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -640,
+        860
+      ],
+      "id": "abb16e31-affb-4e2f-91c6-827c8058c3fd",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Eres un experto consultor SEO técnico. Tu tarea es analizar el código HTML recibido, identificar problemas y carencias SEO (jerarquia, etiquetas open graph, hreflang etc todo), y proponer mejoras concretas y prioritarias. Evalúa tanto el contenido visible como el código fuente (estructura, metaetiquetas, encabezados, enlaces, imágenes, atributos, etc.).\n\nDEVUELVELO TODO EN ESTE IDIOMA: {{ $('LANGUAGE').item.json.lang }}"
+            },
+            {
+              "content": "=Aquí tienes el HTML (URL: {{ $('Edit Fields1').item.json.urls }}):\n\n{{ $('ObtenerContenidoWeb').item.json.data }}\n\nTu análisis debe ser detallado y estar dividido en:\n\nProblemas críticos (que afectan seriamente al SEO)\n\nMejoras recomendadas (importantes pero no críticas)\n\nBuenas prácticas detectadas (si las hay)\n\nPor cada problema o carencia detectada, debes:\n\nExplicar el problema\n\nIndicar por qué afecta al SEO\n\nProponer una solución o fragmento de código alternativo claro y concreto\n\n**MUY IMPORTANTE**\nDevuelve SIEMPRE la respuesta en formato JSON, siguiendo este esquema:\n\njson\n{\n  \"resultado\": [\n    {\n      \"URL\": \"{{ $('Edit Fields1').item.json.urls }}\",\n      \"Problemas\": [\n        {\n          \"Tipo\": \"crítico\",\n          \"Descripcion\": \"Falta el meta title.\",\n          \"Solucion\": \"Añade una etiqueta <title> con palabras clave relevantes.\"\n        }\n      ],\n      \"BuenasPracticas\": [\n        \"Uso correcto de etiquetas <h1>.\"\n      ]\n    }\n  ]\n}\n\n\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -260,
+        860
+      ],
+      "id": "cacaf3cb-35de-4f4c-8163-65006045af76",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "2I5gf8AfXSbFiX1e",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        860
+      ],
+      "id": "12882dff-b5a1-4a36-b036-afc2a5c2f0b7",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "71b9ad22-d418-4fff-92bb-dafd0818575d",
+              "name": "lang",
+              "value": "Spanish (español)",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -760,
+        100
+      ],
+      "id": "32f6dd34-7f01-46f2-8532-e06dd6d0eddd",
+      "name": "LANGUAGE"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $json.url_scan }}/sitemap.xml",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "={{ $json.userAgent }}"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "es-ES,es;q=0.9,en;q=0.8"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip, deflate, br"
+            },
+            {
+              "name": "Referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Upgrade-Insecure-Requests",
+              "value": "1"
+            },
+            {
+              "name": "Sec-Fetch-Dest",
+              "value": "document"
+            },
+            {
+              "name": "Sec-Fetch-Mode",
+              "value": "navigate"
+            },
+            {
+              "name": "DNT",
+              "value": "1"
+            },
+            {
+              "name": "Accept",
+              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -220,
+        100
+      ],
+      "id": "cf5111ad-fac8-412b-a81b-80d4b7d63001",
+      "name": "Maping Sitemap",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "d354a2e4-adfb-4f65-b990-686bbab717e2",
+      "name": "XML1",
+      "type": "n8n-nodes-base.xml",
+      "position": [
+        0,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "errorMessage": "Sitemap mal introducido o URL inválida"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "91e46b5c-bb1f-402c-b1cb-bd82cf6ef11d",
+      "name": "Call Error"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": " message.content.resultado",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        660
+      ],
+      "id": "2e3d7ca5-99c2-473f-ba1b-aa8f92c08414",
+      "name": "Split Out8"
+    },
+    {
+      "parameters": {
+        "sendTo": "youremail@gmail.com",
+        "subject": "=SEO Scan Completed to  ",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        380
+      ],
+      "id": "202e2e8f-a6c7-4f8b-80c2-5dffabc93d4c",
+      "name": "Gmail2",
+      "webhookId": "f620297a-43b1-4be4-925d-2ce10c2f3864",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "iZVnGeUBQpnz210m",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * Node: Code  ▸ Run once for all items\n * Genera HTML bonito con:\n *  • Tabla principal (URL, Tipo, Problema, Solución)\n *  • Bloques de Mejoras y Buenas prácticas\n */\nfunction esc (str = \"\") {\n  return String(str)\n    .replace(/&/g,\"&amp;\")\n    .replace(/</g,\"&lt;\")\n    .replace(/>/g,\"&gt;\");\n}\n\nconst items = $input.all();\n\nlet html = `\n<style>\n  body              { font-family: \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif; }\n  .tbl               { border-collapse: separate; border-spacing:0; width:100%; margin:24px 0; }\n  .tbl th, .tbl td   { padding:12px 10px; vertical-align:top; }\n  .tbl th            { background:#1e88e5; color:#fff; font-weight:600; text-align:left; }\n  .tbl td            { background:#ffffff; border-bottom:1px solid #e0e6eb; }\n  .tbl tr:nth-child(even) td { background:#f7f9fb; }\n  .tbl td:first-child { white-space:nowrap; }\n  .tbl td a          { color:#1e88e5; text-decoration:none; }\n  .tbl td a:hover    { text-decoration:underline; }\n  .critico           { color:#c62828; font-weight:700; }\n  .importante        { color:#ff8f00; font-weight:700; }\n  .bloque            { max-width:980px; margin:auto; }\n  .bloque h3         { margin:24px 0 8px; }\n  ul                 { margin:0 0 16px 20px; padding:0; }\n</style>\n\n<div class=\"bloque\">\n<table class=\"tbl\">\n  <thead>\n    <tr>\n      <th>URL</th>\n      <th>Tipo</th>\n      <th>Problema</th>\n      <th>Solución</th>\n    </tr>\n  </thead>\n  <tbody>\n`;\n\n/* ---------- Tabla principal ---------- */\nitems.forEach(item => {\n  const url       = esc(item.json.URL);\n  const problemas = item.json.Problemas || [];\n  problemas.forEach((p, i) => {\n    html += `\n      <tr>\n        <td>${i === 0 ? `<a href=\"${url}\" target=\"_blank\">${url}</a>` : \"\"}</td>\n        <td class=\"${(p.Tipo || \"\").toLowerCase()}\">${esc(p.Tipo)}</td>\n        <td>${esc(p.Descripcion)}</td>\n        <td>${esc(p.Solucion)}</td>\n      </tr>`;\n  });\n});\n\nhtml += `\n  </tbody>\n</table>\n`;\n\n/* ---------- Bloques de mejoras / buenas prácticas ---------- */\nitems.forEach(item => {\n  const url  = esc(item.json.URL);\n  const mej  = item.json.MejorasRecomendadas || item.json.Mejoras || [];\n  const bp   = item.json.BuenasPracticas || [];\n\n  if (mej.length) {\n    html += `<h3 class=\"importante\">Mejoras recomendadas – <a href=\"${url}\" target=\"_blank\">${url}</a></h3><ul>`;\n    mej.forEach(m => {\n      html += `<li>\n        <strong>${m.Tipo ? `<span class=\"${m.Tipo.toLowerCase()}\">${esc(m.Tipo)}</span> – ` : \"\"}${esc(m.Descripcion)}</strong>\n        ${m.Solucion ? `<br><span style=\"color:#2e7d32;\">${esc(m.Solucion)}</span>` : \"\"}\n      </li>`;\n    });\n    html += `</ul>`;\n  }\n\n  if (bp.length) {\n    html += `<h3 style=\"color:#1e88e5;\">Buenas prácticas – <a href=\"${url}\" target=\"_blank\">${url}</a></h3><ul>`;\n    bp.forEach(txt => html += `<li>${esc(txt)}</li>`);\n    html += `</ul>`;\n  }\n});\n\nhtml += `</div>`;\n\nreturn [{ html }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        660
+      ],
+      "id": "d05b2a0b-7f4c-4a50-9f7b-477b6c31b017",
+      "name": "To html"
+    },
+    {
+      "parameters": {
+        "jsCode": "/*****************************************************************\n * Parse HTML y agrupa por URL\n *   • agrupados = [{ URL, Tipos[], Problemas[], Soluciones[] }]\n *   • Mejoras   = [{ URL, Tipo, Descripcion, Solucion }]\n *****************************************************************/\n\nconst html = $input.first().json.html || \"\";\n\n/* helpers ------------------------------------------------------ */\nconst decode = s => s\n  .replace(/&lt;/g,\"<\").replace(/&gt;/g,\">\")\n  .replace(/&amp;/g,\"&\").replace(/&#39;/g,\"'\")\n  .replace(/&quot;/g,'\"').trim();\nconst strip = s => decode(s.replace(/<[^>]+>/g,\"\").replace(/\\s+/g,\" \"));\n\n/* mapas de agrupación ----------------------------------------- */\nconst map = new Map();      // URL → { Tipos, Problemas, Soluciones }\nconst mejoras = [];\n\n/* ---------- 1) Filas de la tabla ---------- */\nconst rowRE = /<tr>\\s*([\\s\\S]*?)<\\/tr>/g;\nlet   row;\nlet   lastURL = \"\";\n\nwhile ((row = rowRE.exec(html)) !== null) {\n  const tds = [];\n  const tdRE = /<td[^>]*>([\\s\\S]*?)<\\/td>/g;\n  let td;\n  while ((td = tdRE.exec(row[1])) !== null) tds.push(td[1]);\n  if (tds.length !== 4) continue;\n\n  const url = strip(tds[0]) || lastURL;\n  if (url) lastURL = url;\n\n  if (!map.has(url)) {\n    map.set(url, { URL: url, Tipos: [], Problemas: [], Soluciones: [] });\n  }\n  const g = map.get(url);\n  g.Tipos.push     (strip(tds[1]));\n  g.Problemas.push (strip(tds[2]));\n  g.Soluciones.push(strip(tds[3]));\n}\n\n/* ---------- 2) Bloques de mejoras ---------- */\nconst blockRE = /<h3[^>]*class=\"importante\"[^>]*>\\s*Mejoras recomendadas\\s*–\\s*<a[^>]+href=\"([^\"]+)\"[^>]*>[\\s\\S]*?<\\/h3>\\s*<ul>([\\s\\S]*?)<\\/ul>/g;\nlet blk;\n\nwhile ((blk = blockRE.exec(html)) !== null) {\n  const url = blk[1];\n  const ul  = blk[2];\n\n  const liRE = /<li>\\s*<strong>([\\s\\S]*?)<\\/strong>\\s*<br[^>]*>\\s*<span[^>]*>([\\s\\S]*?)<\\/span>/g;\n  let li;\n\n  while ((li = liRE.exec(ul)) !== null) {\n    const rawStrong = li[1];\n    const tipoMatch = rawStrong.match(/<span[^>]*class=\"[^\"]*\"[^>]*>([^<]+)<\\/span>\\s*–\\s*/i);\n    const tipo      = tipoMatch ? strip(tipoMatch[1]) : \"\";\n    const descr     = strip(tipoMatch ? rawStrong.replace(tipoMatch[0], \"\") : rawStrong);\n    const sol       = strip(li[2]);\n\n    mejoras.push({ URL: url, Tipo: tipo, Descripcion: descr, Solucion: sol });\n  }\n}\n\n/* ---------- salida ---------- */\nreturn [{\n  json: {\n    agrupados: Array.from(map.values()),\n    Mejoras: mejoras\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        740
+      ],
+      "id": "fc902b64-326b-46a1-8c3d-4aa19f3df7d1",
+      "name": "Html to JSON"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1axGBe8Cng2yltqlb53YHIC_qwrxzYs8XKZM6JkxoUog",
+          "mode": "list",
+          "cachedResultName": "Hoja de cálculo sin título",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1axGBe8Cng2yltqlb53YHIC_qwrxzYs8XKZM6JkxoUog/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1axGBe8Cng2yltqlb53YHIC_qwrxzYs8XKZM6JkxoUog/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "URL": "={{ $json.URL }}",
+            "Tipo": "={{ $json.Tipos }}",
+            "Descripción": "={{ $json.Problemas }}",
+            "Solución": "={{ $json.Soluciones }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo",
+              "displayName": "Tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Descripción",
+              "displayName": "Descripción",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Solución",
+              "displayName": "Solución",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Recomendación",
+              "displayName": "Recomendación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        640,
+        740
+      ],
+      "id": "12f847db-9a8c-4f23-8ed9-e5d8b0397c90",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "jjutVw7JBF51ZmyY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "agrupados",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        440,
+        740
+      ],
+      "id": "6e51c3c6-684d-4a9a-862b-8736474b6a15",
+      "name": "Split Out10"
+    },
+    {
+      "parameters": {
+        "html": "{{ $json.html }}"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        560
+      ],
+      "id": "edd2b88d-0cd0-434f-a980-466903dd560d",
+      "name": "HTML format viewer"
+    },
+    {
+      "parameters": {
+        "content": "## Part 1 – Workflow Functionality\n\n1. **Trigger (Manual or Webhook)**\n   The workflow can be started either by clicking the \"Test workflow\" button (manual trigger) or through an HTTP webhook, allowing both interactive and automated execution.\n\n2. **LANGUAGE (Language Selection)**\n   This node defines the target language in which the data should be extracted or processed. The user specifies the language before running the workflow.\n\n3. **URL WEB (Website URL Input)**\n   Here, the user enters the target website's URL. This is the base address from which the sitemap and content will be fetched.\n\n4. **UA Rotativo (Rotating User-Agent & Parameters)**\n   This node dynamically generates a User-Agent and other necessary request headers to avoid anti-bot protection. By rotating the User-Agent and varying request parameters, it reduces the risk of being blocked by website security measures.\n\n5. **Maping Sitemap (Sitemap Mapping)**\n   The workflow attempts to locate and access the website’s sitemap (typically found at `/sitemap.xml`). If the sitemap path is incorrect or customized, a manual adjustment may be needed. Errors at this step are usually related to non-standard sitemap URLs.\n\n6. **XML1 (XML to JSON Conversion)**\n   This node parses the sitemap XML and converts it into a JSON object. This structured data format is essential for further automated processing and extraction of URLs or metadata from the sitemap.",
+        "height": 560,
+        "width": 820,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -860,
+        -520
+      ],
+      "id": "6a3ed4a5-6fe8-407c-aa6e-ac46ac5baee4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## PART 1",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1420,
+        100
+      ],
+      "id": "b74286f1-7f13-4896-8d56-268b3daf7be2",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## PART 2",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1160,
+        460
+      ],
+      "id": "fc7afe86-bcd5-4c5f-aadf-4069987e4604",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## PART 3",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1180,
+        760
+      ],
+      "id": "7f868c33-62e2-48cc-a110-778aca100647",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## PART 4",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        620,
+        480
+      ],
+      "id": "95bc1147-ef3f-4233-9948-0b0e15cb4ad4",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Part 2 – Splitting, Filtering, and Deduplication\n\n \n1. Split Out2\nSplits the received XML data into individual items, allowing the workflow to process each URL separately in a loop.\n\n2. Filter\nFilters out URLs that do not meet the desired criteria (e.g., unwanted paths or file types).\n\n3. Filter1\nApplies an additional filtering layer for more specific exclusions, ensuring only relevant URLs remain.\n\n4. Eliminar Webs Duplicadas (Remove Duplicate URLs)\nRemoves any duplicate URLs from the filtered list, ensuring each web address is unique for the next processing steps.",
+        "height": 380,
+        "width": 540,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -40
+      ],
+      "id": "c1d154d1-e0df-42e6-bdb6-e3e795377109",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Part 3 – Page Iteration and AI Analysis\n\n1. **Iterar Páginas (Iterate Pages)**\n   Loops through each filtered and unique URL from the sitemap, processing them one by one.\n\n2. **Split Out8**\n   Splits each item for individual handling in the following steps.\n\n3. **To html**\n   Prepares or transforms the item data into an HTML format if needed.\n\n4. **Edit Fields1**\n   Allows manual editing or adjustment of specific fields before web extraction.\n\n5. **ObtenerContenidoWeb (Get Web Content)**\n   Fetches the live HTML content from each URL.\n\n6. **OpenAI**\n   Sends the HTML content to ChatGPT (using GPT-4o mini) with a professional prompt for analysis, returning the results as structured JSON. The language of the output is controlled by the initial workflow configuration.\n\n7. **Code**\n   Collects and returns all JSON data generated by ChatGPT for each processed URL.\n\n> *Note: The process costs approximately €0.10 for every 20 URLs analyzed.*",
+        "height": 520,
+        "width": 540,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1760,
+        560
+      ],
+      "id": "b251939f-59b6-4157-b8ba-53864044214b",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ec15c986-2924-4fc4-ad82-fa08cfba7957",
+              "leftValue": "={{ $json.loc }}",
+              "rightValue": "={{ $('Method detect').item.json.url_scan }}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -520,
+        400
+      ],
+      "id": "45065db2-c50a-4c82-a35b-1bea939cd791",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        400
+      ],
+      "id": "0b84fe7a-40d6-451a-958b-047751c29b86",
+      "name": "Eliminar Webs Duplicadas"
+    },
+    {
+      "parameters": {
+        "content": "## Part 4 – Output Formatting and Delivery\n\n\nHTML Formatting\nThe JSON data generated by ChatGPT is transformed into a visually appealing HTML format for reporting and presentation.\n\nGmail Output\nSends an HTML-formatted summary email with the scan results, ensuring the information is visually structured and easy to interpret.\n\nWebhook Output\nDelivers the HTML report directly as a webhook response, allowing integration with other platforms or real-time viewing.\n\nGoogle Sheets Output\nConverts the HTML data back to a well-structured JSON format, then appends the results as objects into a Google Sheets document for easy access, tracking, and further analysis.\n\n",
+        "height": 400,
+        "width": 540,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        820,
+        480
+      ],
+      "id": "0e04ec90-f9d9-499e-822b-c7468689f119",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.3,
+      "position": [
+        460,
+        560
+      ],
+      "id": "e266450e-0efa-4736-a0dc-8d1601739144",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "path": "bbdf9cca-e5f4-4bae-afb1-a893ffb51b18",
+        "responseMode": "responseNode",
+        "options": {
+          "ignoreBots": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1220,
+        180
+      ],
+      "id": "0e26ee0e-537a-48a3-a714-f51c3764fac5",
+      "name": "Webhook",
+      "webhookId": "bbdf9cca-e5f4-4bae-afb1-a893ffb51b18",
+      "notes": "using: pag=example.com\n\nReal example:\nhttps://yourspace.app.n8n.cloud/webhook-test/bbdf9cca-e5f4-4bae-afb1-a893ffb51b18?pag=onlineseoscan.com"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1220,
+        0
+      ],
+      "id": "08724753-a7f0-42b4-98a8-27218351d045",
+      "name": "MANUAL"
+    },
+    {
+      "parameters": {
+        "jsCode": "const userAgents = [\n  // Escritorio - Windows\n  \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36\",\n  \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0\",\n  \"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36\",\n\n  // Escritorio - Mac\n  \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.1 Safari/605.1.15\",\n  \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36\",\n\n  // Móvil - Android\n  \"Mozilla/5.0 (Linux; Android 10; SM-G973F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36\",\n  \"Mozilla/5.0 (Linux; Android 9; Mi 9T Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36\",\n\n  // Móvil - iPhone\n  \"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1\",\n  \"Mozilla/5.0 (iPhone; CPU iPhone OS 15_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Mobile/15E148 Safari/604.1\"\n];\n\n// Escoge uno aleatorio\nconst randomUA = userAgents[Math.floor(Math.random() * userAgents.length)];\n\nreturn [\n  {\n    json: {\n      userAgent: randomUA\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -580,
+        100
+      ],
+      "id": "761f8aec-0d4b-4f13-8f09-944b3cc2eb1b",
+      "name": "UA Rotativo1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "71b9ad22-d418-4fff-92bb-dafd0818575d",
+              "name": "url_web_manual",
+              "value": "onlineseoscan.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1020,
+        0
+      ],
+      "id": "2276dc45-424d-402c-91f9-ca2407b02c5f",
+      "name": "URL WEB"
+    },
+    {
+      "parameters": {
+        "jsCode": "let pag, manual;\ntry {\n  pag = $('URL WEB').first()?.json?.url_web_manual;\n} catch (e) {\n  pag = undefined;\n}\ntry {\n  manual = $('Webhook').first()?.json?.query?.pag;\n} catch (e) {\n  manual = undefined;\n}\n// Si pag tiene valor, usarlo; si no, usar manual\nconst url_scan = pag ? pag : manual;\n\nreturn [{ url_scan }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        100
+      ],
+      "id": "b4b162cd-89f3-4714-b1d3-b4978dcf294c",
+      "name": "Method detect"
+    },
+    {
+      "parameters": {
+        "content": "### Using format\n\nPlease enter the URL in the following format:\n\nexample.com\n\nDo not include https://\n\nDo not add / at the end\n\nJust the domain, exactly as shown above.",
+        "height": 280,
+        "width": 290,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1220,
+        -320
+      ],
+      "id": "f6281ede-c275-41c2-a07e-4f63db8af903",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# SCRIPT BY OXSR (oseguir)",
+        "height": 120,
+        "width": 290,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1620,
+        320
+      ],
+      "id": "8301d1c6-eb47-475f-a52a-20ee9cae1f2a",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "### Problems contact viertualwolfapp@gmail.com",
+        "height": 80,
+        "width": 290,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1980,
+        360
+      ],
+      "id": "9ce090a3-d88f-4dc3-bd14-b1e83176806c",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## Webhoock using format\n\nusing: pag=example.com\n\nReal example:\nhttps://yourspace.app.n8n.cloud/webhook-test/bbdf9cca-e5f4-4bae-afb1-a893ffb51b18?pag=onlineseoscan.com",
+        "height": 240,
+        "width": 290,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1580,
+        -280
+      ],
+      "id": "c9cebdbc-439c-483c-a6b3-48ee40e23017",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "# LICENCE IN GITHUB",
+        "height": 120,
+        "width": 290,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1820,
+        100
+      ],
+      "id": "82ef22b6-a55b-42c9-948d-fdf895b3f8be",
+      "name": "Sticky Note14"
+    }
+  ],
+  "connections": {
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ObtenerContenidoWeb": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Iterar Páginas": {
+      "main": [
+        [
+          {
+            "node": "Split Out8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "ObtenerContenidoWeb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Iterar Páginas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LANGUAGE": {
+      "main": [
+        [
+          {
+            "node": "UA Rotativo1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Maping Sitemap": {
+      "main": [
+        [
+          {
+            "node": "XML1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML1": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out8": {
+      "main": [
+        [
+          {
+            "node": "To html",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To html": {
+      "main": [
+        [
+          {
+            "node": "Gmail2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Html to JSON",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTML format viewer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Html to JSON": {
+      "main": [
+        [
+          {
+            "node": "Split Out10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out10": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML format viewer": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Eliminar Webs Duplicadas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eliminar Webs Duplicadas": {
+      "main": [
+        [
+          {
+            "node": "Iterar Páginas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "LANGUAGE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MANUAL": {
+      "main": [
+        [
+          {
+            "node": "URL WEB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UA Rotativo1": {
+      "main": [
+        [
+          {
+            "node": "Method detect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "URL WEB": {
+      "main": [
+        [
+          {
+            "node": "LANGUAGE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Method detect": {
+      "main": [
+        [
+          {
+            "node": "Maping Sitemap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "8a80c29c7b31662c1620f54d32e4b278d8e292907f82f13f4d9417196de2f737"
+  }
+}
