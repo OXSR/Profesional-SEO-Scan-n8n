@@ -15,7 +15,7 @@ Este workflow es capaz de mapear grandes cantidades de URLs, escanearlas una por
 
 ---
 
-## 🛠️ Formas de ejecución
+## Formas de ejecución
 
 - **Manual:** Desde el panel de n8n.
 - **Webhook:** Integra fácilmente con otros sistemas y lanza análisis desde cualquier lugar.
