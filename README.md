@@ -49,3 +49,6 @@ Este workflow es capaz de mapear grandes cantidades de URLs, escanearlas una por
 Consulta el archivo LICENSE para más detalles.
 
 100% BY OXSR (virtualwolfapp@gmail.com more information)
+
+
+Pay for updates (URL: https://n8n.io/workflows/4942-run-complete-technical-seo-audits-with-gpt-4o-ai-analysis-and-multi-format-reporting/)
